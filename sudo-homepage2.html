@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sudo — Drive Anything</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --c-bg: #0a0a0a;
+    --c-surface: #141414;
+    --c-surface2: #1c1c1c;
+    --c-border: rgba(255,255,255,0.08);
+    --c-accent: #E8FF47;
+    --c-accent-dark: #b8cc28;
+    --c-text: #f0ede8;
+    --c-muted: #7a7770;
+    --c-card1: #1a1410;
+    --c-card2: #0d1018;
+    --c-card3: #0f1610;
+    --r: 14px;
+    --r-lg: 20px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--c-bg);
+    color: var(--c-text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* NAV */
+  nav.top-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--c-border);
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 3px;
+    color: var(--c-accent);
+    line-height: 1;
+  }
+
+  .nav-actions { display: flex; align-items: center; gap: 12px; }
+
+  .nav-pill {
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 18px;
+    border-radius: 40px;
+    border: 1px solid var(--c-border);
+    background: transparent;
+    color: var(--c-text);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .nav-pill.accent {
+    background: var(--c-accent);
+    color: #0a0a0a;
+    border-color: var(--c-accent);
+    font-weight: 600;
+  }
+
+  .nav-pill:active { transform: scale(0.97); }
+
+  /* HERO */
+  .hero {
+    min-height: 100svh;
+    padding: 100px 20px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 70% 50% at 70% 40%, rgba(232,255,71,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 60% at 20% 80%, rgba(232,255,71,0.04) 0%, transparent 60%),
+      linear-gradient(180deg, #0a0a0a 0%, #0d0d08 100%);
+  }
+
+  .hero-car-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.12;
+  }
+
+  .hero-car-svg {
+    width: 110%;
+    max-width: 700px;
+    transform: translateX(10%) translateY(-5%);
+  }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--c-accent);
+    font-weight: 500;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.1s forwards;
+  }
+
+  .hero-tag::before {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 1px;
+    background: var(--c-accent);
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(72px, 22vw, 130px);
+    line-height: 0.9;
+    letter-spacing: -1px;
+    color: var(--c-text);
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.2s forwards;
+  }
+
+  .hero-title span { color: var(--c-accent); }
+
+  .hero-sub {
+    font-size: 16px;
+    color: var(--c-muted);
+    font-weight: 300;
+    max-width: 300px;
+    margin-bottom: 36px;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.35s forwards;
+  }
+
+  .hero-cta-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.45s forwards;
+  }
+
+  .btn-primary {
+    flex: 1;
+    min-width: 140px;
+    background: var(--c-accent);
+    color: #0a0a0a;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 16px 24px;
+    border-radius: 40px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+
+  .btn-primary:active { transform: scale(0.97); background: var(--c-accent-dark); }
+
+  .btn-secondary {
+    flex: 1;
+    min-width: 140px;
+    background: transparent;
+    color: var(--c-text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    padding: 16px 24px;
+    border-radius: 40px;
+    border: 1px solid var(--c-border);
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:active { transform: scale(0.97); background: var(--c-surface); }
+
+  /* STATS STRIP */
+  .stats-strip {
+    display: flex;
+    gap: 0;
+    border-top: 1px solid var(--c-border);
+    border-bottom: 1px solid var(--c-border);
+    margin: 0 20px 48px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.55s forwards;
+  }
+
+  .stats-strip::-webkit-scrollbar { display: none; }
+
+  .stat-item {
+    flex: 1;
+    min-width: 110px;
+    padding: 20px 16px;
+    text-align: center;
+    border-right: 1px solid var(--c-border);
+  }
+
+  .stat-item:last-child { border-right: none; }
+
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: var(--c-accent);
+    line-height: 1;
+    display: block;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--c-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+    display: block;
+  }
+
+  /* SEARCH BAR */
+  .search-section {
+    padding: 0 20px 48px;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.6s forwards;
+  }
+
+  .search-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--c-muted);
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .search-box {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-lg);
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .search-field {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    transition: background 0.2s;
+  }
+
+  .search-field:active { background: var(--c-surface2); }
+
+  .search-icon {
+    width: 20px;
+    height: 20px;
+    opacity: 0.5;
+    flex-shrink: 0;
+  }
+
+  .search-field-inner { flex: 1; }
+
+  .search-field-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--c-muted);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .search-field-value {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--c-text);
+  }
+
+  .search-divider {
+    height: 1px;
+    background: var(--c-border);
+    margin: 0 16px;
+  }
+
+  .search-submit {
+    background: var(--c-accent);
+    color: #0a0a0a;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    padding: 16px;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .search-submit svg { width: 18px; height: 18px; }
+  .search-submit:active { transform: scale(0.98); background: var(--c-accent-dark); }
+
+  /* SECTION LABELS */
+  .section {
+    padding: 0 20px 56px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    line-height: 1;
+    letter-spacing: 1px;
+  }
+
+  .section-link {
+    font-size: 13px;
+    color: var(--c-accent);
+    text-decoration: none;
+    font-weight: 500;
+    padding-bottom: 1px;
+    border-bottom: 1px solid rgba(232,255,71,0.4);
+  }
+
+  /* CAR CARDS */
+  .car-scroll {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+    margin: 0 -20px;
+    padding: 0 20px 4px;
+  }
+
+  .car-scroll::-webkit-scrollbar { display: none; }
+
+  .car-card {
+    flex-shrink: 0;
+    width: 260px;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+    position: relative;
+  }
+
+  .car-card:active { transform: scale(0.98); }
+
+  .car-card-img {
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .car-card-img.bg1 { background: #1a1a12; }
+  .car-card-img.bg2 { background: #121a20; }
+  .car-card-img.bg3 { background: #1a1212; }
+  .car-card-img.bg4 { background: #121620; }
+
+  .car-card-img svg {
+    width: 200px;
+    height: 100px;
+    opacity: 0.85;
+  }
+
+  .car-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  .badge-new { background: var(--c-accent); color: #0a0a0a; }
+  .badge-hot { background: rgba(216,90,48,0.2); color: #f0845a; border: 1px solid rgba(216,90,48,0.3); }
+  .badge-ev { background: rgba(29,158,117,0.2); color: #5dcaa5; border: 1px solid rgba(29,158,117,0.3); }
+
+  .heart-btn {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    background: rgba(10,10,10,0.7);
+    backdrop-filter: blur(8px);
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .heart-btn svg { width: 16px; height: 16px; stroke: var(--c-muted); fill: none; transition: all 0.2s; }
+  .heart-btn.liked svg { stroke: #e24b4a; fill: #e24b4a; }
+  .heart-btn:active { transform: scale(0.9); }
+
+  .car-info { padding: 14px 16px 16px; }
+
+  .car-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--c-text);
+    margin-bottom: 4px;
+  }
+
+  .car-meta {
+    font-size: 12px;
+    color: var(--c-muted);
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .car-meta span { display: flex; align-items: center; gap: 4px; }
+  .car-meta svg { width: 12px; height: 12px; }
+
+  .car-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .car-price { font-size: 13px; color: var(--c-muted); }
+  .car-price strong { font-size: 20px; font-weight: 600; color: var(--c-text); margin-right: 2px; }
+
+  .car-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--c-text);
+  }
+
+  .car-rating svg { width: 14px; height: 14px; fill: var(--c-accent); stroke: none; }
+
+  /* CATEGORIES */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .cat-card {
+    border-radius: var(--r);
+    padding: 20px 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid var(--c-border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cat-card.c1 { background: linear-gradient(135deg, #1a1410 0%, #2a200e 100%); }
+  .cat-card.c2 { background: linear-gradient(135deg, #0d1018 0%, #111d2a 100%); }
+  .cat-card.c3 { background: linear-gradient(135deg, #0f1610 0%, #162515 100%); }
+  .cat-card.c4 { background: linear-gradient(135deg, #1a1018 0%, #2a1022 100%); }
+
+  .cat-card:active { transform: scale(0.97); }
+
+  .cat-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 32px;
+    opacity: 0.7;
+  }
+
+  .cat-name {
+    font-size: 15px;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .cat-count {
+    font-size: 12px;
+    color: var(--c-muted);
+  }
+
+  /* HOW IT WORKS */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .step {
+    display: flex;
+    gap: 20px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--c-border);
+    position: relative;
+  }
+
+  .step:last-child { border-bottom: none; }
+
+  .step-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: var(--c-accent);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 48px;
+    opacity: 0.8;
+  }
+
+  .step-content { padding-top: 4px; }
+
+  .step-title {
+    font-size: 17px;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+
+  .step-desc {
+    font-size: 14px;
+    color: var(--c-muted);
+    line-height: 1.6;
+  }
+
+  /* HOSTS / EARN */
+  .earn-card {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-lg);
+    padding: 32px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .earn-card::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(232,255,71,0.08) 0%, transparent 70%);
+  }
+
+  .earn-tag {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--c-accent);
+    font-weight: 500;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .earn-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    line-height: 1;
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+  }
+
+  .earn-desc {
+    font-size: 15px;
+    color: var(--c-muted);
+    margin-bottom: 28px;
+    font-weight: 300;
+    line-height: 1.7;
+  }
+
+  .earn-perks {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .earn-perk {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+  }
+
+  .perk-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--c-accent);
+    flex-shrink: 0;
+  }
+
+  /* TESTIMONIALS */
+  .testimonial-scroll {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin: 0 -20px;
+    padding: 0 20px 4px;
+  }
+
+  .testimonial-scroll::-webkit-scrollbar { display: none; }
+
+  .testi-card {
+    flex-shrink: 0;
+    width: 280px;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-lg);
+    padding: 20px;
+  }
+
+  .testi-stars {
+    display: flex;
+    gap: 3px;
+    margin-bottom: 14px;
+  }
+
+  .testi-stars svg { width: 14px; height: 14px; fill: var(--c-accent); stroke: none; }
+
+  .testi-text {
+    font-size: 14px;
+    color: var(--c-muted);
+    line-height: 1.7;
+    margin-bottom: 16px;
+    font-weight: 300;
+  }
+
+  .testi-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .testi-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .av1 { background: rgba(232,255,71,0.15); color: var(--c-accent); }
+  .av2 { background: rgba(29,158,117,0.15); color: #5dcaa5; }
+  .av3 { background: rgba(216,90,48,0.15); color: #f0845a; }
+
+  .testi-name { font-size: 14px; font-weight: 500; }
+  .testi-car { font-size: 12px; color: var(--c-muted); }
+
+  /* APP PROMO */
+  .app-section {
+    padding: 0 20px 56px;
+  }
+
+  .app-card {
+    background: var(--c-accent);
+    border-radius: var(--r-lg);
+    padding: 32px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .app-card::before {
+    content: '';
+    position: absolute;
+    bottom: -40px; right: -40px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.08);
+  }
+
+  .app-eyebrow {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(0,0,0,0.5);
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .app-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40px;
+    line-height: 1;
+    color: #0a0a0a;
+    margin-bottom: 12px;
+  }
+
+  .app-sub {
+    font-size: 14px;
+    color: rgba(0,0,0,0.55);
+    margin-bottom: 24px;
+    font-weight: 300;
+  }
+
+  .app-btns {
+    display: flex;
+    gap: 10px;
+  }
+
+  .app-store-btn {
+    flex: 1;
+    background: #0a0a0a;
+    color: var(--c-accent);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+
+  .app-store-btn:active { transform: scale(0.97); }
+  .app-store-btn svg { width: 18px; height: 18px; }
+
+  /* FOOTER */
+  footer {
+    padding: 40px 20px;
+    border-top: 1px solid var(--c-border);
+  }
+
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 3px;
+    color: var(--c-accent);
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .footer-tagline {
+    font-size: 14px;
+    color: var(--c-muted);
+    margin-bottom: 32px;
+  }
+
+  .footer-links {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+
+  .footer-links a {
+    font-size: 14px;
+    color: var(--c-muted);
+    text-decoration: none;
+    padding: 4px 0;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:active { color: var(--c-text); }
+
+  .footer-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 24px;
+    border-top: 1px solid var(--c-border);
+  }
+
+  .footer-copy {
+    font-size: 12px;
+    color: var(--c-muted);
+  }
+
+  .footer-social {
+    display: flex;
+    gap: 16px;
+  }
+
+  .footer-social a {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--c-border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--c-muted);
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .footer-social a svg { width: 16px; height: 16px; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s, transform 0.6s;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(10,10,10,0.9);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--c-border);
+    display: flex;
+    padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
+  }
+
+  .bnav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 4px;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .bnav-item.active .bnav-icon { color: var(--c-accent); }
+  .bnav-item.active .bnav-label { color: var(--c-accent); }
+
+  .bnav-icon {
+    color: var(--c-muted);
+    transition: color 0.2s;
+  }
+
+  .bnav-icon svg { width: 22px; height: 22px; }
+
+  .bnav-label {
+    font-size: 10px;
+    color: var(--c-muted);
+    letter-spacing: 0.3px;
+    transition: color 0.2s;
+  }
+
+  .content-wrap {
+    padding-bottom: 80px;
+  }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--c-border);
+    margin: 0 20px 48px;
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <span class="logo">SUDO</span>
+  <div class="nav-actions">
+    <a href="#" class="nav-pill">Log in</a>
+    <a href="#" class="nav-pill accent">List car</a>
+  </div>
+</nav>
+
+<div class="content-wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-car-placeholder">
+      <!-- Minimalist car silhouette -->
+      <svg class="hero-car-svg" viewBox="0 0 700 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M80 200 L80 180 Q80 165 95 165 L605 165 Q620 165 620 180 L620 200 Q620 215 605 215 L95 215 Q80 215 80 200 Z" fill="rgba(232,255,71,0.15)" stroke="rgba(232,255,71,0.4)" stroke-width="1"/>
+        <path d="M160 165 L200 110 Q215 90 240 88 L440 85 Q470 84 495 105 L550 165" fill="rgba(232,255,71,0.08)" stroke="rgba(232,255,71,0.35)" stroke-width="1"/>
+        <circle cx="175" cy="215" r="34" fill="#0a0a0a" stroke="rgba(232,255,71,0.5)" stroke-width="1.5"/>
+        <circle cx="175" cy="215" r="22" fill="rgba(232,255,71,0.06)" stroke="rgba(232,255,71,0.3)" stroke-width="1"/>
+        <circle cx="175" cy="215" r="8" fill="rgba(232,255,71,0.3)"/>
+        <circle cx="520" cy="215" r="34" fill="#0a0a0a" stroke="rgba(232,255,71,0.5)" stroke-width="1.5"/>
+        <circle cx="520" cy="215" r="22" fill="rgba(232,255,71,0.06)" stroke="rgba(232,255,71,0.3)" stroke-width="1"/>
+        <circle cx="520" cy="215" r="8" fill="rgba(232,255,71,0.3)"/>
+        <rect x="580" y="170" width="50" height="12" rx="4" fill="rgba(232,255,71,0.6)"/>
+        <rect x="70" y="170" width="50" height="10" rx="4" fill="rgba(232,255,71,0.25)"/>
+        <line x1="80" y1="165" x2="620" y2="165" stroke="rgba(232,255,71,0.15)" stroke-width="0.5"/>
+      </svg>
+    </div>
+
+    <div style="position:relative;">
+      <div class="hero-tag">Egypt's #1 Car Sharing</div>
+      <h1 class="hero-title">DRIVE<br><span>ANY</span><br>THING.</h1>
+      <p class="hero-sub">Book unique cars from local owners. Anytime, anywhere in Cairo.</p>
+      <div class="hero-cta-row">
+        <a href="#search" class="btn-primary">Find a car</a>
+        <a href="#how" class="btn-secondary">How it works</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-strip fade-in">
+    <div class="stat-item">
+      <span class="stat-num">4.2K+</span>
+      <span class="stat-label">Cars listed</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">98%</span>
+      <span class="stat-label">Happy trips</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">50+</span>
+      <span class="stat-label">Cities</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">250K</span>
+      <span class="stat-label">Members</span>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <section class="search-section fade-in" id="search">
+    <span class="search-label">Quick Search</span>
+    <div class="search-box">
+      <div class="search-field">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+          <circle cx="12" cy="9" r="2.5"/>
+        </svg>
+        <div class="search-field-inner">
+          <span class="search-field-label">Location</span>
+          <span class="search-field-value">Cairo, Egypt</span>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="search-divider"></div>
+      <div class="search-field">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="3" y="4" width="18" height="18" rx="2"/>
+          <path d="M16 2v4M8 2v4M3 10h18"/>
+        </svg>
+        <div class="search-field-inner">
+          <span class="search-field-label">Pick-up date</span>
+          <span class="search-field-value">Today</span>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="search-divider"></div>
+      <div class="search-field">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 6v6l4 2"/>
+        </svg>
+        <div class="search-field-inner">
+          <span class="search-field-label">Duration</span>
+          <span class="search-field-value">3 days</span>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <button class="search-submit">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="M21 21l-4.35-4.35"/>
+        </svg>
+        Search Available Cars
+      </button>
+    </div>
+  </section>
+
+  <!-- FEATURED CARS -->
+  <section class="section fade-in">
+    <div class="section-header">
+      <h2 class="section-title">Top Picks</h2>
+      <a href="#" class="section-link">See all</a>
+    </div>
+    <div class="car-scroll">
+
+      <!-- Car 1 -->
+      <div class="car-card">
+        <div class="car-card-img bg1">
+          <svg viewBox="0 0 200 90" fill="none">
+            <path d="M20 65 L20 55 Q20 48 27 48 L173 48 Q180 48 180 55 L180 65 Q180 72 173 72 L27 72 Q20 72 20 65Z" fill="rgba(232,255,71,0.15)" stroke="rgba(232,255,71,0.4)" stroke-width="0.8"/>
+            <path d="M45 48 L60 30 Q65 24 74 23 L125 23 Q135 23 142 30 L162 48" fill="rgba(232,255,71,0.08)" stroke="rgba(232,255,71,0.35)" stroke-width="0.8"/>
+            <circle cx="55" cy="72" r="14" fill="#1a1a12" stroke="rgba(232,255,71,0.5)" stroke-width="0.8"/>
+            <circle cx="55" cy="72" r="8" fill="rgba(232,255,71,0.1)" stroke="rgba(232,255,71,0.3)" stroke-width="0.5"/>
+            <circle cx="55" cy="72" r="3" fill="rgba(232,255,71,0.4)"/>
+            <circle cx="148" cy="72" r="14" fill="#1a1a12" stroke="rgba(232,255,71,0.5)" stroke-width="0.8"/>
+            <circle cx="148" cy="72" r="8" fill="rgba(232,255,71,0.1)" stroke="rgba(232,255,71,0.3)" stroke-width="0.5"/>
+            <circle cx="148" cy="72" r="3" fill="rgba(232,255,71,0.4)"/>
+            <rect x="162" y="52" width="20" height="5" rx="2" fill="rgba(232,255,71,0.7)"/>
+          </svg>
+          <span class="car-badge badge-hot">Popular</span>
+          <button class="heart-btn" onclick="this.classList.toggle('liked')">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+        </div>
+        <div class="car-info">
+          <div class="car-name">BMW 5 Series</div>
+          <div class="car-meta">
+            <span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              Ahmed K.
+            </span>
+            <span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/></svg>
+              Maadi
+            </span>
+          </div>
+          <div class="car-footer">
+            <div class="car-price"><strong>EGP 850</strong>/day</div>
+            <div class="car-rating">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              4.9
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Car 2 -->
+      <div class="car-card">
+        <div class="car-card-img bg2">
+          <svg viewBox="0 0 200 90" fill="none">
+            <path d="M15 62 L15 52 Q15 44 24 44 L176 44 Q185 44 185 52 L185 62 Q185 70 176 70 L24 70 Q15 70 15 62Z" fill="rgba(56,180,255,0.12)" stroke="rgba(56,180,255,0.4)" stroke-width="0.8"/>
+            <path d="M40 44 L68 22 Q75 16 88 15 L115 15 Q128 15 140 25 L165 44" fill="rgba(56,180,255,0.07)" stroke="rgba(56,180,255,0.3)" stroke-width="0.8"/>
+            <circle cx="50" cy="70" r="15" fill="#0d1018" stroke="rgba(56,180,255,0.5)" stroke-width="0.8"/>
+            <circle cx="50" cy="70" r="9" fill="rgba(56,180,255,0.1)" stroke="rgba(56,180,255,0.3)" stroke-width="0.5"/>
+            <circle cx="50" cy="70" r="3" fill="rgba(56,180,255,0.5)"/>
+            <circle cx="152" cy="70" r="15" fill="#0d1018" stroke="rgba(56,180,255,0.5)" stroke-width="0.8"/>
+            <circle cx="152" cy="70" r="9" fill="rgba(56,180,255,0.1)" stroke="rgba(56,180,255,0.3)" stroke-width="0.5"/>
+            <circle cx="152" cy="70" r="3" fill="rgba(56,180,255,0.5)"/>
+            <rect x="168" y="50" width="18" height="4" rx="2" fill="rgba(56,180,255,0.7)"/>
+          </svg>
+          <span class="car-badge badge-ev">⚡ Electric</span>
+          <button class="heart-btn liked" onclick="this.classList.toggle('liked')">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+        </div>
+        <div class="car-info">
+          <div class="car-name">Tesla Model 3</div>
+          <div class="car-meta">
+            <span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              Sara M.
+            </span>
+            <span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/></svg>
+              Zamalek
+            </span>
+          </div>
+          <div class="car-footer">
+            <div class="car-price"><strong>EGP 1,200</strong>/day</div>
+            <div class="car-rating">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              5.0
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Car 3 -->
+      <div class="car-card">
+        <div class="car-card-img bg3">
+          <svg viewBox="0 0 200 90" fill="none">
+            <path d="M10 66 L10 54 Q10 46 20 46 L180 46 Q190 46 190 54 L190 66 Q190 74 180 74 L20 74 Q10 74 10 66Z" fill="rgba(93,202,165,0.12)" stroke="rgba(93,202,165,0.4)" stroke-width="0.8"/>
+            <path d="M35 46 L55 26 Q63 18 76 17 L130 17 Q143 17 153 27 L172 46" fill="rgba(93,202,165,0.07)" stroke="rgba(93,202,165,0.3)" stroke-width="0.8"/>
+            <circle cx="48" cy="74" r="15" fill="#0f1610" stroke="rgba(93,202,165,0.5)" stroke-width="0.8"/>
+            <circle cx="48" cy="74" r="9" fill="rgba(93,202,165,0.1)" stroke="rgba(93,202,165,0.3)" stroke-width="0.5"/>
+            <circle cx="48" cy="74" r="3" fill="rgba(93,202,165,0.5)"/>
+            <circle cx="155" cy="74" r="15" fill="#0f1610" stroke="rgba(93,202,165,0.5)" stroke-width="0.8"/>
+            <circle cx="155" cy="74" r="9" fill="rgba(93,202,165,0.1)" stroke="rgba(93,202,165,0.3)" stroke-width="0.5"/>
+            <circle cx="155" cy="74" r="3" fill="rgba(93,202,165,0.5)"/>
+            <rect x="173" y="52" width="20" height="5" rx="2" fill="rgba(93,202,165,0.7)"/>
+          </svg>
+          <span class="car-badge badge-new">New</span>
+          <button class="heart-btn" onclick="this.classList.toggle('liked')">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+        </div>
+        <div class="car-info">
+          <div class="car-name">Range Rover Sport</div>
+          <div class="car-meta">
+            <span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              Omar F.
+            </span>
+            <span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/></svg>
+              Heliopolis
+            </span>
+          </div>
+          <div class="car-footer">
+            <div class="car-price"><strong>EGP 1,800</strong>/day</div>
+            <div class="car-rating">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              4.8
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Car 4 -->
+      <div class="car-card">
+        <div class="car-card-img bg4">
+          <svg viewBox="0 0 200 90" fill="none">
+            <path d="M18 63 L18 53 Q18 46 26 46 L174 46 Q182 46 182 53 L182 63 Q182 70 174 70 L26 70 Q18 70 18 63Z" fill="rgba(208,153,255,0.12)" stroke="rgba(208,153,255,0.35)" stroke-width="0.8"/>
+            <path d="M42 46 L65 26 Q72 20 84 19 L118 19 Q132 19 144 28 L163 46" fill="rgba(208,153,255,0.07)" stroke="rgba(208,153,255,0.25)" stroke-width="0.8"/>
+            <circle cx="52" cy="70" r="13" fill="#121620" stroke="rgba(208,153,255,0.5)" stroke-width="0.8"/>
+            <circle cx="52" cy="70" r="8" fill="rgba(208,153,255,0.1)" stroke="rgba(208,153,255,0.3)" stroke-width="0.5"/>
+            <circle cx="52" cy="70" r="3" fill="rgba(208,153,255,0.4)"/>
+            <circle cx="150" cy="70" r="13" fill="#121620" stroke="rgba(208,153,255,0.5)" stroke-width="0.8"/>
+            <circle cx="150" cy="70" r="8" fill="rgba(208,153,255,0.1)" stroke="rgba(208,153,255,0.3)" stroke-width="0.5"/>
+            <circle cx="150" cy="70" r="3" fill="rgba(208,153,255,0.4)"/>
+            <rect x="165" y="50" width="18" height="4" rx="2" fill="rgba(208,153,255,0.7)"/>
+          </svg>
+          <button class="heart-btn" onclick="this.classList.toggle('liked')">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+        </div>
+        <div class="car-info">
+          <div class="car-name">Porsche Cayenne</div>
+          <div class="car-meta">
+            <span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              Nour A.
+            </span>
+            <span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/></svg>
+              6th October
+            </span>
+          </div>
+          <div class="car-footer">
+            <div class="car-price"><strong>EGP 2,200</strong>/day</div>
+            <div class="car-rating">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              4.7
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="section fade-in">
+    <div class="section-header">
+      <h2 class="section-title">Browse by type</h2>
+    </div>
+    <div class="cat-grid">
+      <div class="cat-card c1">
+        <svg class="cat-icon" viewBox="0 0 40 40" fill="none">
+          <path d="M8 28 L8 22 Q8 18 12 18 L28 18 Q32 18 32 22 L32 28 Q32 32 28 32 L12 32 Q8 32 8 28Z" stroke="rgba(232,255,71,0.6)" stroke-width="1" fill="rgba(232,255,71,0.08)"/>
+          <path d="M13 18 L17 10 Q18.5 8 21 8 L22 8 Q24 8 26 11 L30 18" stroke="rgba(232,255,71,0.5)" stroke-width="1" fill="rgba(232,255,71,0.05)"/>
+          <circle cx="14" cy="32" r="4" stroke="rgba(232,255,71,0.6)" stroke-width="1" fill="rgba(232,255,71,0.1)"/>
+          <circle cx="28" cy="32" r="4" stroke="rgba(232,255,71,0.6)" stroke-width="1" fill="rgba(232,255,71,0.1)"/>
+        </svg>
+        <span class="cat-name">Sedans</span>
+        <span class="cat-count">840 cars</span>
+      </div>
+      <div class="cat-card c2">
+        <svg class="cat-icon" viewBox="0 0 40 40" fill="none">
+          <path d="M5 28 L5 20 Q5 15 10 15 L30 15 Q35 15 35 20 L35 28 Q35 33 30 33 L10 33 Q5 33 5 28Z" stroke="rgba(56,138,221,0.6)" stroke-width="1" fill="rgba(56,138,221,0.08)"/>
+          <path d="M10 15 L13 7 Q14.5 5 17 5 L23 5 Q26 5 28 8 L32 15" stroke="rgba(56,138,221,0.5)" stroke-width="1" fill="rgba(56,138,221,0.05)"/>
+          <circle cx="12" cy="33" r="5" stroke="rgba(56,138,221,0.6)" stroke-width="1" fill="rgba(56,138,221,0.1)"/>
+          <circle cx="29" cy="33" r="5" stroke="rgba(56,138,221,0.6)" stroke-width="1" fill="rgba(56,138,221,0.1)"/>
+        </svg>
+        <span class="cat-name">SUVs</span>
+        <span class="cat-count">1,200 cars</span>
+      </div>
+      <div class="cat-card c3">
+        <svg class="cat-icon" viewBox="0 0 40 40" fill="none">
+          <rect x="5" y="14" width="30" height="18" rx="3" stroke="rgba(93,202,165,0.6)" stroke-width="1" fill="rgba(93,202,165,0.08)"/>
+          <path d="M9 14 L12 7 L28 7 L31 14" stroke="rgba(93,202,165,0.5)" stroke-width="1" fill="rgba(93,202,165,0.05)"/>
+          <circle cx="12" cy="33" r="4.5" stroke="rgba(93,202,165,0.6)" stroke-width="1" fill="rgba(93,202,165,0.1)"/>
+          <circle cx="28" cy="33" r="4.5" stroke="rgba(93,202,165,0.6)" stroke-width="1" fill="rgba(93,202,165,0.1)"/>
+          <path d="M2 22 L5 22" stroke="rgba(93,202,165,0.6)" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M35 22 L38 22" stroke="rgba(93,202,165,0.6)" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span class="cat-name">Vans</span>
+        <span class="cat-count">320 cars</span>
+      </div>
+      <div class="cat-card c4">
+        <svg class="cat-icon" viewBox="0 0 40 40" fill="none">
+          <path d="M6 27 L6 20 Q6 16 10 16 L30 16 Q34 16 34 20 L34 27" stroke="rgba(208,153,255,0.6)" stroke-width="1" fill="rgba(208,153,255,0.08)"/>
+          <path d="M10 16 L14 8 Q16 6 20 6 Q24 6 26 8 L30 16" stroke="rgba(208,153,255,0.5)" stroke-width="1" fill="rgba(208,153,255,0.05)"/>
+          <path d="M6 27 Q6 32 10 32 L30 32 Q34 32 34 27" stroke="rgba(208,153,255,0.6)" stroke-width="1" fill="rgba(208,153,255,0.06)"/>
+          <circle cx="12" cy="32" r="4" stroke="rgba(208,153,255,0.6)" stroke-width="1" fill="rgba(208,153,255,0.1)"/>
+          <circle cx="28" cy="32" r="4" stroke="rgba(208,153,255,0.6)" stroke-width="1" fill="rgba(208,153,255,0.1)"/>
+          <path d="M20 6 L20 3 M17 4 L23 4" stroke="rgba(208,153,255,0.5)" stroke-width="1" stroke-linecap="round"/>
+        </svg>
+        <span class="cat-name">Luxury</span>
+        <span class="cat-count">560 cars</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- HOW IT WORKS -->
+  <section class="section fade-in" id="how">
+    <div class="section-header">
+      <h2 class="section-title">How it works</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <div class="step-title">Find your car</div>
+          <div class="step-desc">Search thousands of cars near you by location, date, and type. Filter by price, features, or fuel type.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <div class="step-title">Book instantly</div>
+          <div class="step-desc">Request the car or book instantly. Most trips are confirmed in minutes. Pay securely through the app.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <div class="step-title">Hit the road</div>
+          <div class="step-desc">Meet the owner, grab the keys, and go. Every trip includes roadside assistance and basic insurance.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <div class="step-title">Return & review</div>
+          <div class="step-desc">Drop the car back off, leave a review for the host, and start planning your next adventure.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- EARN SECTION -->
+  <section class="section fade-in">
+    <div class="earn-card">
+      <span class="earn-tag">For car owners</span>
+      <div class="earn-title">YOUR CAR EARNS WHILE YOU REST</div>
+      <p class="earn-desc">Share your car on your own schedule and earn extra income every month. You set the price, rules, and availability.</p>
+      <div class="earn-perks">
+        <div class="earn-perk"><div class="perk-dot"></div>EGP 15,000+ avg monthly earnings</div>
+        <div class="earn-perk"><div class="perk-dot"></div>Full insurance coverage on every trip</div>
+        <div class="earn-perk"><div class="perk-dot"></div>24/7 host support line</div>
+        <div class="earn-perk"><div class="perk-dot"></div>You're always in control</div>
+      </div>
+      <a href="#" class="btn-primary" style="display:block; text-align:center;">List your car — it's free</a>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="section fade-in">
+    <div class="section-header">
+      <h2 class="section-title">Real trips, real people</h2>
+    </div>
+    <div class="testimonial-scroll">
+      <div class="testi-card">
+        <div class="testi-stars">
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <p class="testi-text">Booked a Tesla for the weekend through Sudo. The whole process was smooth and the host was incredibly accommodating. Will definitely use again.</p>
+        <div class="testi-author">
+          <div class="testi-avatar av1">LM</div>
+          <div>
+            <div class="testi-name">Layla M.</div>
+            <div class="testi-car">Tesla Model 3 · Cairo</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="testi-stars">
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <p class="testi-text">I list my BMW on weekends and make around EGP 12,000 extra each month. Sudo handles all the payments and it's genuinely stress-free.</p>
+        <div class="testi-author">
+          <div class="testi-avatar av2">KH</div>
+          <div>
+            <div class="testi-name">Karim H.</div>
+            <div class="testi-car">Host · BMW 5 Series</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="testi-stars">
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <p class="testi-text">Found a Range Rover for a family road trip to Alexandria. Car was immaculate and the host was kind enough to drop it off to us. 10/10.</p>
+        <div class="testi-author">
+          <div class="testi-avatar av3">DA</div>
+          <div>
+            <div class="testi-name">Dalia A.</div>
+            <div class="testi-car">Range Rover · Alexandria</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APP PROMO -->
+  <section class="app-section fade-in">
+    <div class="app-card">
+      <span class="app-eyebrow">Available now</span>
+      <div class="app-title">BOOK ON THE GO.</div>
+      <p class="app-sub">Download the Sudo app and get EGP 200 off your first trip.</p>
+      <div class="app-btns">
+        <button class="app-store-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          App Store
+        </button>
+        <button class="app-store-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.35.2.75.22 1.12.06L14 16.79l-2.64-2.64-8.18 9.61zM20.73 10.6L17.5 8.7l-2.96 2.78 2.94 2.94 3.22-1.88c.89-.5.89-1.94.03-1.94zM1.86.21C1.63.47 1.5.83 1.5 1.28v21.44c0 .45.13.81.36 1.07l.06.06L13.16 12.7v-.28L1.92.15l-.06.06zM14 7.21L4.3.18C3.93.02 3.53.04 3.18.23L13.86 11z"/></svg>
+          Google Play
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span class="footer-logo">SUDO</span>
+    <p class="footer-tagline">Drive anything. Anywhere.</p>
+    <div class="footer-links">
+      <a href="#">How it works</a>
+      <a href="#">List your car</a>
+      <a href="#">Insurance</a>
+      <a href="#">Help center</a>
+      <a href="#">About us</a>
+      <a href="#">Careers</a>
+      <a href="#">Blog</a>
+      <a href="#">Safety</a>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2026 Sudo Technologies. All rights reserved.</span>
+      <div class="footer-social">
+        <a href="#" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="#" aria-label="Twitter / X">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4l16 16M4 20L20 4"/></svg>
+        </a>
+        <a href="#" aria-label="Facebook">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <a href="#" class="bnav-item active">
+    <div class="bnav-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <span class="bnav-label">Home</span>
+  </a>
+  <a href="#" class="bnav-item">
+    <div class="bnav-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    </div>
+    <span class="bnav-label">Explore</span>
+  </a>
+  <a href="#" class="bnav-item">
+    <div class="bnav-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    </div>
+    <span class="bnav-label">Saved</span>
+  </a>
+  <a href="#" class="bnav-item">
+    <div class="bnav-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+    </div>
+    <span class="bnav-label">Trips</span>
+  </a>
+  <a href="#" class="bnav-item">
+    <div class="bnav-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </div>
+    <span class="bnav-label">Profile</span>
+  </a>
+</div>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// Bottom nav active state
+document.querySelectorAll('.bnav-item').forEach(item => {
+  item.addEventListener('click', function(e) {
+    e.preventDefault();
+    document.querySelectorAll('.bnav-item').forEach(i => i.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+</script>
+
+</body>
+</html>
